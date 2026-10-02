@@ -190,6 +190,10 @@ Describe 'home page' {
         $both | Should -BeNullOrEmpty
     }
 
+    It 'styles the note titles as visible links (accent colour, underlined)' {
+        $HomeHtml | Should -Match '\[data-role="note-title"\]\s*\{[^}]*color: var\(--secondary\)[^}]*text-decoration: underline'
+    }
+
     It 'links each note to its page' {
         $Pinned | Should -Match 'href="\./p2"'
         $List | Should -Match 'href="\./n3"'

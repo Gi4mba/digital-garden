@@ -182,12 +182,18 @@ export const GARDEN_CSS = `
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: var(--dark);
-  text-decoration: none;
+  color: var(--secondary);
   background: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 .page[data-frame="garden"] .garden-home [data-role="note-title"]:hover {
-  color: var(--secondary);
+  text-decoration-thickness: 3px;
+}
+.page[data-frame="garden"] .garden-home [data-role="note-title"]:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 3px;
 }
 .page[data-frame="garden"] .garden-home [data-role="note"] [data-role="summary"] {
   margin: 0.4rem 0 0;
