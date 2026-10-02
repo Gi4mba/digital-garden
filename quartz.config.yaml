@@ -15,29 +15,29 @@ configuration:
     cdnCaching: true
     typography:
       header: Schibsted Grotesk
-      body: Source Sans Pro
+      body: Literata
       code: IBM Plex Mono
     colors:
       lightMode:
-        light: "#faf8f8"
-        lightgray: "#e5e5e5"
-        gray: "#b8b8b8"
-        darkgray: "#4e4e4e"
-        dark: "#2b2b2b"
-        secondary: "#284b63"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
-        textHighlight: "#fff23688"
+        light: "#F3F5F5"
+        lightgray: "#D6DDDC"
+        gray: "#8A9694"
+        darkgray: "#3F4B49"
+        dark: "#18201F"
+        secondary: "#1F6F78"
+        tertiary: "#1F6F78"
+        highlight: rgba(31, 111, 120, 0.12)
+        textHighlight: "#FFF23688"
       darkMode:
-        light: "#161618"
-        lightgray: "#393639"
-        gray: "#646464"
-        darkgray: "#d4d4d4"
-        dark: "#ebebec"
-        secondary: "#7b97aa"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
-        textHighlight: "#b3aa0288"
+        light: "#0F1414"
+        lightgray: "#263030"
+        gray: "#6F7D7B"
+        darkgray: "#C9D3D1"
+        dark: "#E3EAE9"
+        secondary: "#6DBFC6"
+        tertiary: "#6DBFC6"
+        highlight: rgba(109, 191, 198, 0.15)
+        textHighlight: "#B3AA0288"
 plugins:
   - source: "@quartz-community/created-modified-date"
     enabled: true
@@ -98,6 +98,10 @@ plugins:
     order: 92
   - source: "@quartz-community/quartz-fonts"
     enabled: true
+    options:
+      header: Schibsted Grotesk
+      body: Literata
+      code: IBM Plex Mono
   - source: "@quartz-themes/core"
     enabled: false
     options:

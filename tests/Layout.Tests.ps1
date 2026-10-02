@@ -74,6 +74,22 @@ Describe 'article page' {
         Test-Path -LiteralPath (Join-Path $script:Out 'img/città-1.jpg') | Should -BeTrue
     }
 
+    It 'has a top bar that links back to the home' {
+        $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*>Hyphae</a>'
+        $nested = Get-Page 'cartella/annidata.html'
+        $nested | Should -Match '<nav data-role="site-nav"[^>]*><a href="../"[^>]*>Hyphae</a>'
+    }
+
+    It 'ends the page with the thread divider inside the footer' {
+        $f = Get-Index $Article '<footer data-role="site-footer"'
+        $Article.Substring($f) | Should -Match 'data-role="thread"'
+    }
+
+    It 'sets a 56rem wide column with a 42rem text measure' {
+        $Article | Should -Match '56rem'
+        $Article | Should -Match '42rem'
+    }
+
     It 'has a footer with the home link and the current year' {
         $f = Get-Index $Article '<footer data-role="site-footer"'
         $footer = $Article.Substring($f)

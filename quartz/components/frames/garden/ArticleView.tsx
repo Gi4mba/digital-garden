@@ -1,4 +1,6 @@
 import { PageFrameProps } from "../types"
+import { siteInfo } from "../../../site-info"
+import { pathToRoot } from "../../../util/path"
 import { coverSrc, formatNoteDate, noteDate } from "./notes"
 import { SiteFooter } from "./SiteFooter"
 
@@ -12,6 +14,9 @@ export function ArticleView({ componentData, pageBody: Content }: PageFrameProps
 
   return (
     <>
+      <nav data-role="site-nav">
+        <a href={`${pathToRoot(fileData.slug!)}/`}>{siteInfo.name}</a>
+      </nav>
       <main class="garden-column">
         <header data-role="article-header">
           <h1>{title}</h1>
