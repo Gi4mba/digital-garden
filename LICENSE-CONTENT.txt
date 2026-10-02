@@ -1,0 +1,10 @@
+This repository contains personal notes, thoughts, and journal entries by the author.
+All textual contents are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
+
+To view a copy of this license, visit:
+https://creativecommons.org
+
+If you use, translate, or distribute these texts or notes, you are required to:
+1. Attribute the original author by providing a link to this GitHub repository.
+2. Not use the material for commercial purposes or financial gain.
+3. Distribute any derivative works under the exact same license.
