@@ -12,3 +12,6 @@ replit.nix
 .quartz/
 quartz/cli/tui/dist/
 .turbo/
+.superpowers/
+tests/.out/
+scripts/publish.config.json
