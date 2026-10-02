@@ -41,7 +41,7 @@ Describe 'article page' {
         $header | Should -Match '<h1[^>]*>Prova &amp; &lt;test(&gt;|>)</h1>'
         $header | Should -Match 'data-role="summary"[^>]*>Summary (&quot;|")di prova(&quot;|")'
         $header | Should -Not -Match '<test>'
-        $header | Should -Match '2026'
+        $header | Should -Match '1 September 2026'
     }
 
     It 'gives the cover a valid, encoded URL that points to an emitted file' {
@@ -75,14 +75,14 @@ Describe 'article page' {
     }
 
     It 'has a top bar that links back to the home' {
-        $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*>Hyphae</a>'
+        $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*>Home</a>'
         $nested = Get-Page 'cartella/annidata.html'
-        $nested | Should -Match '<nav data-role="site-nav"[^>]*><a href="../"[^>]*>Hyphae</a>'
+        $nested | Should -Match '<nav data-role="site-nav"[^>]*><a href="../"[^>]*>Home</a>'
     }
 
     It 'ends the page with the thread divider inside the footer' {
         $f = Get-Index $Article '<footer data-role="site-footer"'
-        $Article.Substring($f) | Should -Match 'data-role="thread"'
+        $Article.Substring($f) | Should -Match 'data-role="thread"[^>]*preserveAspectRatio="none"|preserveAspectRatio="none"[^>]*data-role="thread"'
     }
 
     It 'sets a 56rem wide column with a 42rem text measure' {
@@ -163,7 +163,7 @@ Describe 'home page' {
 
     It 'has the site name, description and footer, and no disabled components' {
         $HomeHtml | Should -Match '<h1[^>]*>Hyphae</h1>'
-        $HomeHtml | Should -Match 'Appunti e articoli dal mio giardino digitale'
+        $HomeHtml | Should -Match 'The visible part is the post. The network underneath is how I think.'
         $HomeHtml | Should -Match '<footer data-role="site-footer"'
         $HomeHtml | Should -Not -Match $script:MarkerRegex
     }

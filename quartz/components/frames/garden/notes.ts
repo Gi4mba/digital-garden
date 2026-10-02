@@ -41,7 +41,7 @@ export function hrefTo(from: FullSlug, to: FullSlug): string {
 }
 
 export function formatNoteDate(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("it-IT", {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-GB", {
     year: "numeric",
     month: "long",
     day: "numeric",

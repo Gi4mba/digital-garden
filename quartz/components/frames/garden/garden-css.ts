@@ -124,8 +124,8 @@ export const GARDEN_CSS = `
 }
 .page[data-frame="garden"] footer[data-role="site-footer"] svg {
   display: block;
-  width: 7.5rem;
-  height: auto;
+  width: 100%;
+  height: 1.5rem;
   margin-bottom: 1rem;
   color: var(--secondary);
 }

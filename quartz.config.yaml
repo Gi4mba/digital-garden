@@ -4,7 +4,7 @@ configuration:
   pageTitleSuffix: ""
   enableSPA: false
   enablePopovers: false
-  locale: it-IT
+  locale: en-GB
   baseUrl: gi4mba.github.io/digital-garden
   ignorePatterns:
     - private
