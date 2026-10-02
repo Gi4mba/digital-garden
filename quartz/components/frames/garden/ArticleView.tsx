@@ -1,6 +1,7 @@
 import { PageFrameProps } from "../types"
 import { pathToRoot } from "../../../util/path"
 import { coverSrc, formatNoteDate, noteDate } from "./notes"
+import { ProgressThread } from "./ProgressThread"
 import { SiteFooter } from "./SiteFooter"
 
 export function ArticleView({ componentData, pageBody: Content }: PageFrameProps) {
@@ -13,6 +14,7 @@ export function ArticleView({ componentData, pageBody: Content }: PageFrameProps
 
   return (
     <>
+      <ProgressThread />
       <nav data-role="site-nav">
         <a href={`${pathToRoot(fileData.slug!)}/`}>Home</a>
       </nav>

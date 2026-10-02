@@ -1,8 +1,7 @@
-// Scoped to the garden frame. Widths: 56rem column, 42rem text measure.
+// Scoped to the garden frame. The whole page, text included, uses the 56rem column.
 export const GARDEN_CSS = `
 .page[data-frame="garden"] {
   --garden-wide: 56rem;
-  --garden-measure: 42rem;
   --garden-gutter: clamp(16px, 4vw, 32px);
 }
 
@@ -41,7 +40,6 @@ export const GARDEN_CSS = `
 }
 .page[data-frame="garden"] [data-role="summary"] {
   margin: 0 0 1rem;
-  max-width: var(--garden-measure);
   font-size: clamp(1.1rem, 2.2vw, 1.35rem);
   line-height: 1.5;
   color: var(--darkgray);
@@ -61,11 +59,8 @@ export const GARDEN_CSS = `
 
 /* Article body */
 .page[data-frame="garden"] .markdown-rendered {
-  font-size: clamp(1.0625rem, 0.9rem + 0.5vw, 1.1875rem);
+  font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
   line-height: 1.7;
-}
-.page[data-frame="garden"] .markdown-rendered > :where(p, ul, ol, h2, h3, h4, blockquote, hr, details) {
-  max-width: var(--garden-measure);
 }
 .page[data-frame="garden"] .markdown-rendered :where(p, li, blockquote) {
   line-height: 1.7;
@@ -150,7 +145,6 @@ export const GARDEN_CSS = `
 }
 .page[data-frame="garden"] [data-role="tagline"] {
   margin: 0;
-  max-width: var(--garden-measure);
   font-size: clamp(1.1rem, 2.2vw, 1.3rem);
   line-height: 1.5;
   color: var(--darkgray);
@@ -229,5 +223,67 @@ export const GARDEN_CSS = `
   .page[data-frame="garden"] .garden-home [data-section="list"] [data-role="note"] > :not(time) {
     grid-column: 2;
   }
+}
+
+/* Growing thread: progress along the top edge while reading */
+.page[data-frame="garden"] div[data-role="progress"] {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 12px;
+  z-index: 10;
+  pointer-events: none;
+  color: var(--secondary);
+}
+.page[data-frame="garden"] div[data-role="progress"] svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.page[data-frame="garden"] div[data-role="progress"] path {
+  transition: opacity 0.4s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page[data-frame="garden"] div[data-role="progress"] path {
+    transition: none;
+  }
+}
+
+/* Home: faint network behind the header */
+.page[data-frame="garden"] .garden-home header[data-role="site-header"] {
+  position: relative;
+}
+.page[data-frame="garden"] svg[data-role="network"] {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 18rem;
+  z-index: -1;
+  color: var(--secondary);
+  opacity: 0.45;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
+}
+
+/* Home: the newest pinned note is the feature */
+.page[data-frame="garden"] .garden-home [data-section="pinned"] ul {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+.page[data-frame="garden"] .garden-home [data-featured="true"] {
+  grid-column: 1 / -1;
+}
+.page[data-frame="garden"] .garden-home [data-featured="true"] img[data-role="card-cover"] {
+  aspect-ratio: 2 / 1;
+  margin-bottom: 1.25rem;
+}
+.page[data-frame="garden"] .garden-home [data-featured="true"] [data-role="note-title"] {
+  font-size: clamp(1.7rem, 4.2vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+.page[data-frame="garden"] .garden-home [data-featured="true"] [data-role="summary"] {
+  margin-top: 0.6rem;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
 }
 `

@@ -85,9 +85,22 @@ Describe 'article page' {
         $Article.Substring($f) | Should -Match 'data-role="thread"[^>]*preserveAspectRatio="none"|preserveAspectRatio="none"[^>]*data-role="thread"'
     }
 
-    It 'sets a 56rem wide column with a 42rem text measure' {
+    It 'lets the text fill the whole 56rem column' {
         $Article | Should -Match '56rem'
-        $Article | Should -Match '42rem'
+        $Article | Should -Not -Match '42rem'
+    }
+
+    It 'has the growing-thread progress bar with its script' {
+        $Article | Should -Match '<div data-role="progress"'
+        $Article | Should -Match 'stroke-dashoffset'
+    }
+
+    It 'looks up the headings when laying out, not while the page is still being parsed' {
+        $Article | Should -Match 'function layout\(\)\{var heads='
+    }
+
+    It 'has no network background on article pages' {
+        $Article | Should -Not -Match '<svg data-role="network"'
     }
 
     It 'has a footer with the home link and the current year' {
@@ -139,6 +152,18 @@ Describe 'home page' {
         $script:HomeHtml = Get-Page 'index.html'
         $script:Pinned = Get-Section $script:HomeHtml 'pinned'
         $script:List = Get-Section $script:HomeHtml 'list'
+    }
+
+    It 'draws the faint network behind the home header and no progress bar' {
+        $HomeHtml | Should -Match '<svg data-role="network"'
+        ([regex]::Matches($HomeHtml, '<circle')).Count | Should -BeGreaterThan 20
+        $HomeHtml | Should -Not -Match '<div data-role="progress"'
+    }
+
+    It 'features only the newest pinned note' {
+        ([regex]::Matches($Pinned, 'data-featured="true"')).Count | Should -Be 1
+        $Pinned | Should -Match '<li data-role="note" data-featured="true"[^>]*>(?:(?!</li>).)*Pin Due'
+        $List | Should -Not -Match 'data-featured'
     }
 
     It 'shows the pinned notes newest first, each with a cover image' {
