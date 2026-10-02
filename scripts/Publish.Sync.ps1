@@ -26,6 +26,23 @@ function Sync-PublishContent {
     if ($LASTEXITCODE -ge 8) { throw "robocopy fallito (exit code $LASTEXITCODE)" }
 }
 
+function Test-UnpushedCommits {
+    param([string]$RepoDir)
+    $n = & git -C $RepoDir rev-list --count 'origin/main..HEAD' 2>$null
+    if ($LASTEXITCODE -ne 0) { return $true }   # origin/main unknown: assume there is something to push
+    [int]$n -gt 0
+}
+
+function Push-Publish {
+    param([string]$RepoDir)
+    & git -C $RepoDir push origin HEAD 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "ERRORE: push fallito. Il commit locale resta: controlla rete/credenziali e rilancia lo script."
+        return 2
+    }
+    return 0
+}
+
 function Invoke-Publish {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([int])]
@@ -54,11 +71,23 @@ function Invoke-Publish {
         return 0
     }
 
+    $branch = (& git -C $RepoDir rev-parse --abbrev-ref HEAD 2>$null)
+    if ($branch -ne 'main') {
+        Write-Host "ERRORE: il repo e' sul branch '$branch': passa a 'main' (e' il branch che fa partire il deploy)."
+        return 2
+    }
+
     Sync-PublishContent -PublishDir $PublishDir -ContentDir $contentDir
 
     & git -C $RepoDir add -A -- content 2>&1 | Out-Null
     & git -C $RepoDir diff --cached --quiet -- content 2>&1 | Out-Null
-    if ($LASTEXITCODE -eq 0) { Write-Host "Nessuna modifica da pubblicare."; return 0 }
+    if ($LASTEXITCODE -eq 0) {
+        if (-not (Test-UnpushedCommits -RepoDir $RepoDir)) { Write-Host "Nessuna modifica da pubblicare."; return 0 }
+        Write-Host "Nessuna nuova modifica, ma ci sono commit non ancora inviati: li invio."
+        $rc = Push-Publish -RepoDir $RepoDir
+        if ($rc -eq 0) { Write-Host "Pubblicato." }
+        return $rc
+    }
 
     $changes = @(& git -C $RepoDir diff --cached --name-status -- content)
     Write-Host "File che diventano pubblici:"
@@ -71,11 +100,7 @@ function Invoke-Publish {
     & git -C $RepoDir commit -m $message -- content 2>&1 | Out-Null
     if ($LASTEXITCODE -ne 0) { Write-Host "ERRORE: git commit fallito."; return 2 }
 
-    & git -C $RepoDir push origin HEAD 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "ERRORE: push fallito. Il commit locale resta: controlla rete/credenziali e rilancia lo script."
-        return 2
-    }
-    Write-Host "Pubblicato: $message"
-    return 0
+    $rc = Push-Publish -RepoDir $RepoDir
+    if ($rc -eq 0) { Write-Host "Pubblicato: $message" }
+    return $rc
 }

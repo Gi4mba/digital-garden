@@ -136,4 +136,27 @@ Describe 'Invoke-Publish' {
         Get-Commits $e | Should -Be ($before + 1)
         $r.Text | Should -BeLike '*rilanci*'
     }
+
+    It 're-running after a failed push pushes the stranded commit' {
+        $e = New-Env
+        Add-Note $e 'a.md'
+        Invoke-Git $e.Repo remote set-url origin (Join-Path $e.Root 'nope.git')
+        (Invoke-PublishCapture @{ PublishDir = $e.Pub; RepoDir = $e.Repo }).Code | Should -Be 2
+        Invoke-Git $e.Repo remote set-url origin $e.Remote
+        $r = Invoke-PublishCapture @{ PublishDir = $e.Pub; RepoDir = $e.Repo }
+        $r.Code | Should -Be 0
+        (Get-Git $e.Remote log -1 --format=%s main) | Should -Be 'publish: 1 aggiornate, 0 rimosse'
+    }
+
+    It 'refuses to publish from a branch other than main and changes nothing' {
+        $e = New-Env
+        Add-Note $e 'a.md'
+        Invoke-Git $e.Repo checkout -b feature
+        $before = Get-Commits $e
+        $r = Invoke-PublishCapture @{ PublishDir = $e.Pub; RepoDir = $e.Repo }
+        $r.Code | Should -Be 2
+        $r.Text | Should -BeLike '*main*'
+        Test-Path (Join-Path $e.Repo 'content/a.md') | Should -BeFalse
+        Get-Commits $e | Should -Be $before
+    }
 }

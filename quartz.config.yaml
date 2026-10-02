@@ -117,7 +117,7 @@ plugins:
   - source: "@quartz-community/favicon"
     enabled: true
   - source: "@quartz-community/og-image"
-    enabled: true
+    enabled: false
   - source: "@quartz-community/cname"
     enabled: false
   - source: "@quartz-community/canvas-page"

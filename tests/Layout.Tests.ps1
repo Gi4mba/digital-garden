@@ -67,6 +67,13 @@ Describe 'article page' {
         $Article | Should -Not -Match $script:MarkerRegex
     }
 
+    It 'points og:image and twitter:image at the emitted cover' {
+        $expected = 'https://gi4mba.github.io/digital-garden/img/citt%C3%A0-1.jpg'
+        $Article | Should -Match ('<meta property="og:image" content="' + [regex]::Escape($expected) + '"')
+        $Article | Should -Match ('<meta name="twitter:image" content="' + [regex]::Escape($expected) + '"')
+        Test-Path -LiteralPath (Join-Path $script:Out 'img/città-1.jpg') | Should -BeTrue
+    }
+
     It 'has a footer with the home link and the current year' {
         $f = Get-Index $Article '<footer data-role="site-footer"'
         $footer = $Article.Substring($f)

@@ -18,4 +18,6 @@ pwsh scripts/publish.ps1 -WhatIf   # anteprima, non tocca nulla
 pwsh scripts/publish.ps1           # valida, copia, commit, push
 ```
 
+Il repo locale deve stare sul branch `main` (lo script rifiuta altrimenti: è quello che fa partire il deploy). Se un push fallisce, rilancia lo script: reinvia i commit rimasti indietro.
+
 La home (`content/index.md`) appartiene al repo e non viene toccata dal mirror. Test: `Invoke-Pester tests/` (Pester >= 5.5). Anteprima locale: `npx quartz build --serve -d content`.

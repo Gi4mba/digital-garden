@@ -1,17 +1,19 @@
 import { i18n } from "../i18n"
-import { FullSlug, getFileExtension, joinSegments, pathToRoot } from "../util/path"
+import {
+  FilePath,
+  FullSlug,
+  getFileExtension,
+  joinSegments,
+  pathToRoot,
+  slugifyFilePath,
+} from "../util/path"
 import { CSSResourceToStyleElement, JSResourceToScriptElement } from "../util/resources"
 import { googleFontHref, googleFontSubsetHref } from "../util/theme"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { unescapeHTML } from "../util/escape"
 
 export default (() => {
-  const Head: QuartzComponent = ({
-    cfg,
-    fileData,
-    externalResources,
-    ctx,
-  }: QuartzComponentProps) => {
+  const Head: QuartzComponent = ({ cfg, fileData, externalResources }: QuartzComponentProps) => {
     const titleSuffix = cfg.pageTitleSuffix ?? ""
     const title =
       (fileData.frontmatter?.title ?? i18n(cfg.locale).propertyDefaults.title) + titleSuffix
@@ -31,8 +33,11 @@ export default (() => {
     const socialUrl =
       fileData.slug === "404" ? url.toString() : joinSegments(url.toString(), fileData.slug!)
 
-    const usesCustomOgImage = ctx.cfg.plugins.emitters.some((e) => e.name === "CustomOgImages")
-    const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
+    // Social preview = the note's cover image, as emitted by Quartz (slugified, encoded).
+    const cover = fileData.frontmatter?.image
+    const ogImage = cover
+      ? `https://${cfg.baseUrl}/${encodeURI(slugifyFilePath(String(cover) as FilePath))}`
+      : undefined
 
     const coreStylesheet = css[0]?.content
     const coreScript = js.find(
@@ -69,14 +74,14 @@ export default (() => {
         <meta property="og:description" content={description} />
         <meta property="og:image:alt" content={description} />
 
-        {!usesCustomOgImage && (
+        {ogImage && (
           <>
-            <meta property="og:image" content={ogImageDefaultPath} />
-            <meta property="og:image:url" content={ogImageDefaultPath} />
-            <meta name="twitter:image" content={ogImageDefaultPath} />
+            <meta property="og:image" content={ogImage} />
+            <meta property="og:image:url" content={ogImage} />
+            <meta name="twitter:image" content={ogImage} />
             <meta
               property="og:image:type"
-              content={`image/${getFileExtension(ogImageDefaultPath) ?? "png"}`}
+              content={`image/${getFileExtension(ogImage) ?? "png"}`}
             />
           </>
         )}
