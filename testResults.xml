@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="17" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2026-10-02" time="19:42:11">
+  <environment clr-version="10.0.12" user-domain="BESHTIOMERO" platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk0\Partition3" machine-name="BESHTIOMERO" cwd="C:\Users\Gianba\Documents\digital-garden" user="Giamba" os-version="10.0.26200" nunit-version="2.5.8.0" />
+  <culture-info current-culture="it-IT" current-uiculture="it-IT" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="0.7857" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="C:\Users\Gianba\Documents\digital-garden\tests\Validation.Tests.ps1" executed="True" result="Success" success="True" time="0.7857" asserts="0" description="C:\Users\Gianba\Documents\digital-garden\tests\Validation.Tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Read-NoteFrontmatter" executed="True" result="Success" success="True" time="0.1313" asserts="0" description="Read-NoteFrontmatter">
+            <results>
+              <test-case description="reads a CRLF file with quoted value containing a colon" name="Read-NoteFrontmatter.reads a CRLF file with quoted value containing a colon" time="0.0909" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="returns an empty hashtable without frontmatter" name="Read-NoteFrontmatter.returns an empty hashtable without frontmatter" time="0.0084" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+          <test-suite type="TestFixture" name="Test-PublishNotes" executed="True" result="Success" success="True" time="0.4418" asserts="0" description="Test-PublishNotes">
+            <results>
+              <test-case description="accepts a valid note" name="Test-PublishNotes.accepts a valid note" time="0.0507" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="errors on a missing image file" name="Test-PublishNotes.errors on a missing image file" time="0.0106" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="accepts an image with spaces and accents" name="Test-PublishNotes.accepts an image with spaces and accents" time="0.0122" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="resolves image relative to the Publish root for a note in a subfolder" name="Test-PublishNotes.resolves image relative to the Publish root for a note in a subfolder" time="0.0108" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="allows 4 pinned notes" name="Test-PublishNotes.allows 4 pinned notes" time="0.0246" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="errors with all names when 5 notes are pinned" name="Test-PublishNotes.errors with all names when 5 notes are pinned" time="0.0308" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="warns (not errors) on a missing date" name="Test-PublishNotes.warns (not errors) on a missing date" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="warns on an unparsable date" name="Test-PublishNotes.warns on an unparsable date" time="0.0148" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="warns on a wikilink to a note that is not published" name="Test-PublishNotes.warns on a wikilink to a note that is not published" time="0.012" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="does not warn on valid links, aliases, headings or embeds" name="Test-PublishNotes.does not warn on valid links, aliases, headings or embeds" time="0.0171" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="reports the three required fields for a note without frontmatter" name="Test-PublishNotes.reports the three required fields for a note without frontmatter" time="0.0137" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="ignores .obsidian and .trash" name="Test-PublishNotes.ignores .obsidian and .trash" time="0.0147" asserts="0" success="True" result="Success" executed="True" />
+              <test-suite type="ParameterizedTest" name="Test-PublishNotes.reports a missing &lt;field&gt;" executed="True" result="Success" success="True" time="0.0702" asserts="0" description="reports a missing &lt;field&gt;">
+                <results>
+                  <test-case description="reports a missing title" name="Test-PublishNotes.reports a missing title" time="0.0273" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="reports a missing description" name="Test-PublishNotes.reports a missing description" time="0.0126" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="reports a missing image" name="Test-PublishNotes.reports a missing image" time="0.0304" asserts="0" success="True" result="Success" executed="True" />
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
