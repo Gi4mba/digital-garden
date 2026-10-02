@@ -1,5 +1,6 @@
 import { PageFrame, PageFrameProps } from "../types"
 import { ArticleView } from "./ArticleView"
+import { HomeView } from "./HomeView"
 import { GARDEN_CSS } from "./garden-css"
 
 // Follows the OS light/dark preference; there is no manual toggle by design.
@@ -16,7 +17,11 @@ export const GardenFrame: PageFrame = {
     return (
       <>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <ArticleView {...props} />
+        {props.componentData.fileData.slug === "index" ? (
+          <HomeView {...props} />
+        ) : (
+          <ArticleView {...props} />
+        )}
       </>
     )
   },

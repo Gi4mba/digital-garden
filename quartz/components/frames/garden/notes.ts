@@ -53,7 +53,7 @@ export function listNotes(allFiles: QuartzPluginData[]): NoteInfo[] {
   const notes: NoteInfo[] = []
   for (const file of allFiles) {
     const fm = file.frontmatter as Record<string, any> | undefined
-    if (!file.slug || file.slug === "index" || !fm?.title) continue
+    if (!file.slug || file.slug === "index" || file.slug === "404" || !fm?.title) continue
     notes.push({
       slug: file.slug,
       title: String(fm.title),

@@ -74,3 +74,89 @@ Describe 'article page' {
         $footer | Should -Match ([string](Get-Date).Year)
     }
 }
+
+Describe 'home page' {
+    BeforeAll {
+        function New-Fixture {
+            param([string]$Name, [object[]]$Notes)
+            $dir = Join-Path ([IO.Path]::GetTempPath()) "garden-fixtures/$Name"
+            if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+            New-Item -ItemType Directory -Force (Join-Path $dir 'img') | Out-Null
+            Copy-Item (Join-Path $script:Repo 'tests/fixtures/site/img/*') (Join-Path $dir 'img')
+            [IO.File]::WriteAllText((Join-Path $dir 'index.md'), "---`ntitle: Hyphae`n---`n")
+            foreach ($n in $Notes) {
+                $lines = @('---', "title: $($n.Title)", "description: Summary $($n.Title)", 'image: img/città 1.jpg')
+                if ($n.Date) { $lines += "date: $($n.Date)" }
+                if ($n.Pinned) { $lines += 'pinned: true' }
+                $lines += @('---', 'Corpo.')
+                [IO.File]::WriteAllText((Join-Path $dir "$($n.File).md"), ($lines -join "`n"))
+            }
+            $dir
+        }
+        function Get-Section {
+            param([string]$Html, [string]$Name)
+            $m = [regex]::Match($Html, "<section data-section=`"$Name`".*?</section>", 'Singleline')
+            if ($m.Success) { $m.Value } else { $null }
+        }
+        function Get-Titles {
+            param([string]$Section)
+            if (-not $Section) { return @() }
+            @([regex]::Matches($Section, 'data-role="note-title"[^>]*>([^<]+)<') | ForEach-Object { $_.Groups[1].Value })
+        }
+
+        $notes = @(
+            @{ File = 'p1'; Title = 'Pin Uno'; Date = '2026-03-01'; Pinned = $true },
+            @{ File = 'p2'; Title = 'Pin Due'; Date = '2026-05-01'; Pinned = $true },
+            @{ File = 'n1'; Title = 'Nota Giugno'; Date = '2026-06-01' },
+            @{ File = 'n2'; Title = 'Nota Febbraio'; Date = '2026-02-01' },
+            @{ File = 'n3'; Title = 'Nota Senza Data' },
+            @{ File = 'n4'; Title = 'Nota Alfa'; Date = '2026-06-01' }
+        )
+        Build-Site (New-Fixture 'home' $notes)
+        $script:HomeHtml = Get-Page 'index.html'
+        $script:Pinned = Get-Section $script:HomeHtml 'pinned'
+        $script:List = Get-Section $script:HomeHtml 'list'
+    }
+
+    It 'shows the pinned notes newest first, each with a cover image' {
+        Get-Titles $Pinned | Should -Be @('Pin Due', 'Pin Uno')
+        ([regex]::Matches($Pinned, '<img')).Count | Should -Be 2
+    }
+
+    It 'lists the other notes newest first, undated last, without images' {
+        Get-Titles $List | Should -Be @('Nota Alfa', 'Nota Giugno', 'Nota Febbraio', 'Nota Senza Data')
+        $List | Should -Not -Match '<img'
+    }
+
+    It 'never repeats a note in both sections' {
+        $both = @(Get-Titles $Pinned) | Where-Object { (Get-Titles $List) -contains $_ }
+        $both | Should -BeNullOrEmpty
+    }
+
+    It 'links each note to its page' {
+        $Pinned | Should -Match 'href="\./p2"'
+        $List | Should -Match 'href="\./n3"'
+    }
+
+    It 'has the site name, description and footer, and no disabled components' {
+        $HomeHtml | Should -Match '<h1[^>]*>Hyphae</h1>'
+        $HomeHtml | Should -Match 'Appunti e articoli dal mio giardino digitale'
+        $HomeHtml | Should -Match '<footer data-role="site-footer"'
+        $HomeHtml | Should -Not -Match $script:MarkerRegex
+    }
+
+    It 'omits the pinned section when nothing is pinned' {
+        Build-Site (New-Fixture 'home-nopins' @(@{ File = 'n1'; Title = 'Solo Lista'; Date = '2026-01-01' }))
+        $html = Get-Page 'index.html'
+        $html | Should -Not -Match '<section data-section="pinned"'
+        Get-Titles (Get-Section $html 'list') | Should -Be @('Solo Lista')
+    }
+
+    It 'caps pinned at 4 and moves the extra pinned note to the list' {
+        $many = 1..5 | ForEach-Object { @{ File = "m$_"; Title = "Pin $_"; Date = "2026-0$_-01"; Pinned = $true } }
+        Build-Site (New-Fixture 'home-many' $many)
+        $html = Get-Page 'index.html'
+        Get-Titles (Get-Section $html 'pinned') | Should -Be @('Pin 5', 'Pin 4', 'Pin 3', 'Pin 2')
+        Get-Titles (Get-Section $html 'list') | Should -Be @('Pin 1')
+    }
+}
