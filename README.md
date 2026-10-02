@@ -1,17 +1,21 @@
-# Quartz v5
+# Hyphae — digital garden
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+Blog personale su [Quartz 5](https://quartz.jzhao.xyz/), pubblicato su GitHub Pages: https://gi4mba.github.io/digital-garden/
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+Le note vivono nel vault Obsidian, nella cartella `Publish/`. `scripts/publish.ps1` le valida, le copia in `content/`, fa commit e push; una GitHub Action costruisce il sito.
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+## Setup (una volta)
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+1. PowerShell 7, Node >= 22, git.
+2. `copy scripts\publish.config.example.json scripts\publish.config.json` e imposta `publishDir` sul percorso di `Publish/`.
+3. Su GitHub: Settings → Pages → Source "GitHub Actions".
+4. In ogni nota da pubblicare: `title`, `description`, `image` (relativo a `Publish/`); opzionali `date: yyyy-MM-dd` e `pinned: true` (max 4).
 
-## Sponsors
+## Pubblicare
 
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+```powershell
+pwsh scripts/publish.ps1 -WhatIf   # anteprima, non tocca nulla
+pwsh scripts/publish.ps1           # valida, copia, commit, push
+```
+
+La home (`content/index.md`) appartiene al repo e non viene toccata dal mirror. Test: `Invoke-Pester tests/` (Pester >= 5.5). Anteprima locale: `npx quartz build --serve -d content`.

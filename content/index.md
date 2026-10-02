@@ -1,5 +1,3 @@
 ---
-title: Home
+title: Hyphae
 ---
-
-Home di prova.
