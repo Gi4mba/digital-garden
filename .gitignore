@@ -16,3 +16,4 @@ quartz/cli/tui/dist/
 tests/.out/
 scripts/publish.config.json
 testResults.xml
+.claude/
