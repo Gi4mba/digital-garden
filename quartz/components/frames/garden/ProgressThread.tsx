@@ -36,7 +36,7 @@ export function ProgressThread() {
             pathLength="1"
             stroke-dasharray="1"
             stroke-dashoffset="1"
-            vector-effect="non-scaling-stroke"
+            stroke-linecap="butt"
           />
           <g />
         </svg>

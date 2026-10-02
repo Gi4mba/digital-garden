@@ -58,6 +58,11 @@ export const GARDEN_CSS = `
 }
 
 /* Article body */
+.page[data-frame="garden"] [data-role="summary"],
+.page[data-frame="garden"] [data-role="tagline"],
+.page[data-frame="garden"] .markdown-rendered :where(p, li, blockquote) {
+  text-wrap: wrap;
+}
 .page[data-frame="garden"] .markdown-rendered {
   font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
   line-height: 1.7;
@@ -233,6 +238,7 @@ export const GARDEN_CSS = `
   z-index: 10;
   pointer-events: none;
   color: var(--secondary);
+  background: var(--light);
 }
 .page[data-frame="garden"] div[data-role="progress"] svg {
   display: block;

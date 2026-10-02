@@ -95,6 +95,15 @@ Describe 'article page' {
         $Article | Should -Match 'stroke-dashoffset'
     }
 
+    It 'fills each line of summary and body text up to the column edge' {
+        $Article | Should -Match 'text-wrap: wrap'
+    }
+
+    It 'draws the progress thread as one continuous stroke' {
+        $Article | Should -Not -Match '<path data-main[^>]*vector-effect'
+        $Article | Should -Match '<path data-main[^>]*stroke-linecap="butt"'
+    }
+
     It 'looks up the headings when laying out, not while the page is still being parsed' {
         $Article | Should -Match 'function layout\(\)\{var heads='
     }
