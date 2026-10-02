@@ -2,7 +2,7 @@ This repository contains personal notes, thoughts, and journal entries by the au
 All textual contents are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
 
 To view a copy of this license, visit:
-https://creativecommons.org
+https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 If you use, translate, or distribute these texts or notes, you are required to:
 1. Attribute the original author by providing a link to this GitHub repository.
