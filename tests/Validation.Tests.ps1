@@ -42,6 +42,15 @@ Describe 'Test-PublishNotes' {
         New-TestFile $pub 'img/c.jpg' | Out-Null
     }
 
+    It 'accepts tags as a YAML list or inline, without errors or warnings' {
+        New-TestNote $pub 'a.md' ((New-ValidFront) + @('tags:', '  - mesh', '  - Smart Contracts'))
+        New-TestNote $pub 'b.md' ((New-ValidFront) + @('tags: [mesh, rust]'))
+        $r = Test-PublishNotes -PublishDir $pub
+        $r.Errors | Should -BeNullOrEmpty
+        $r.Warnings | Should -BeNullOrEmpty
+        $r.Notes.Count | Should -Be 2
+    }
+
     It 'accepts a valid note' {
         New-TestNote $pub 'a.md' (New-ValidFront)
         $r = Test-PublishNotes -PublishDir $pub
