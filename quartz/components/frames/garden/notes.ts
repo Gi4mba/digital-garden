@@ -17,6 +17,7 @@ export type NoteInfo = {
   image?: string
   date?: string
   pinned: boolean
+  tags: string[]
 }
 
 /** Frontmatter `date` as yyyy-MM-dd, or undefined when missing/invalid. */
@@ -29,6 +30,21 @@ export function noteDate(fm: Record<string, any> | undefined): string | undefine
 
 export function isPinned(fm: Record<string, any> | undefined): boolean {
   return fm?.pinned === true || String(fm?.pinned).toLowerCase() === "true"
+}
+
+/**
+ * Frontmatter `tags` (list or comma-separated text), normalized like note-properties does:
+ * lowercase, inner spaces as "-", no duplicates. So "Mesh" and "mesh" are one tag.
+ */
+export function noteTags(fm: Record<string, any> | undefined): string[] {
+  const raw = fm?.tags
+  if (raw === undefined || raw === null) return []
+  const items = Array.isArray(raw) ? raw : String(raw).split(",")
+  const tags = items
+    .filter((t) => typeof t === "string" || typeof t === "number")
+    .map((t) => String(t).trim().toLowerCase().replace(/\s+/g, "-"))
+    .filter((t) => t !== "")
+  return [...new Set(tags)]
 }
 
 /** URL of the cover image relative to the page, as emitted by Quartz (slugified, then encoded). */
@@ -61,6 +77,7 @@ export function listNotes(allFiles: QuartzPluginData[]): NoteInfo[] {
       image: fm.image ? String(fm.image) : undefined,
       date: noteDate(fm),
       pinned: isPinned(fm),
+      tags: noteTags(fm),
     })
   }
   return notes
