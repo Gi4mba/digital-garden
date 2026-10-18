@@ -14,7 +14,48 @@ BeforeAll {
     function Get-Page { param([string]$Name) [IO.File]::ReadAllText((Join-Path $script:Out $Name)) }
     function Get-Index { param([string]$Html, [string]$Needle) $Html.IndexOf($Needle, [StringComparison]::Ordinal) }
 
-    $script:MarkerRegex = 'class="[^"]*\b(explorer|graph|backlinks|search|toc|breadcrumb-container|darkmode|readermode|page-title|sidebar)\b'
+    function New-Fixture {
+        param([string]$Name, [object[]]$Notes)
+        $dir = Join-Path ([IO.Path]::GetTempPath()) "garden-fixtures/$Name"
+        if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+        New-Item -ItemType Directory -Force (Join-Path $dir 'img') | Out-Null
+        Copy-Item (Join-Path $script:Repo 'tests/fixtures/site/img/*') (Join-Path $dir 'img')
+        [IO.File]::WriteAllText((Join-Path $dir 'index.md'), "---`ntitle: Hyphae`n---`n")
+        foreach ($n in $Notes) {
+            $lines = @('---', "title: $($n.Title)", "description: Summary $($n.Title)", 'image: img/città 1.jpg')
+            if ($n.Date) { $lines += "date: $($n.Date)" }
+            if ($n.Pinned) { $lines += 'pinned: true' }
+            # An array becomes a YAML list (as Obsidian writes it); a string stays inline.
+            if ($n.Tags -is [array]) { $lines += 'tags:'; $lines += @($n.Tags | ForEach-Object { "  - $_" }) }
+            elseif ($n.Tags) { $lines += "tags: $($n.Tags)" }
+            $lines += @('---', 'Corpo.')
+            [IO.File]::WriteAllText((Join-Path $dir "$($n.File).md"), ($lines -join "`n"))
+        }
+        $dir
+    }
+    function Get-Section {
+        param([string]$Html, [string]$Name)
+        $m = [regex]::Match($Html, "<section data-section=`"$Name`".*?</section>", 'Singleline')
+        if ($m.Success) { $m.Value } else { $null }
+    }
+    function Get-Titles {
+        param([string]$Section)
+        if (-not $Section) { return @() }
+        @([regex]::Matches($Section, 'data-role="note-title"[^>]*>([^<]+)<') | ForEach-Object { $_.Groups[1].Value })
+    }
+    function Get-TagCards {
+        param([string]$Html)
+        @([regex]::Matches($Html, '<details data-role="tag-card".*?</details>', 'Singleline') | ForEach-Object {
+                $card = $_.Value
+                [pscustomobject]@{
+                    Name   = [regex]::Match($card, 'data-role="tag-name"[^>]*>([^<]+)<').Groups[1].Value
+                    Total  = [regex]::Match($card, 'data-role="tag-count"[^>]*>([^<]+)<').Groups[1].Value
+                    Titles = Get-Titles $card
+                }
+            })
+    }
+
+    $script:MarkerRegex ='class="[^"]*\b(explorer|graph|backlinks|search|toc|breadcrumb-container|darkmode|readermode|page-title|sidebar)\b'
 }
 
 Describe 'article page' {
@@ -122,33 +163,6 @@ Describe 'article page' {
 
 Describe 'home page' {
     BeforeAll {
-        function New-Fixture {
-            param([string]$Name, [object[]]$Notes)
-            $dir = Join-Path ([IO.Path]::GetTempPath()) "garden-fixtures/$Name"
-            if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
-            New-Item -ItemType Directory -Force (Join-Path $dir 'img') | Out-Null
-            Copy-Item (Join-Path $script:Repo 'tests/fixtures/site/img/*') (Join-Path $dir 'img')
-            [IO.File]::WriteAllText((Join-Path $dir 'index.md'), "---`ntitle: Hyphae`n---`n")
-            foreach ($n in $Notes) {
-                $lines = @('---', "title: $($n.Title)", "description: Summary $($n.Title)", 'image: img/città 1.jpg')
-                if ($n.Date) { $lines += "date: $($n.Date)" }
-                if ($n.Pinned) { $lines += 'pinned: true' }
-                $lines += @('---', 'Corpo.')
-                [IO.File]::WriteAllText((Join-Path $dir "$($n.File).md"), ($lines -join "`n"))
-            }
-            $dir
-        }
-        function Get-Section {
-            param([string]$Html, [string]$Name)
-            $m = [regex]::Match($Html, "<section data-section=`"$Name`".*?</section>", 'Singleline')
-            if ($m.Success) { $m.Value } else { $null }
-        }
-        function Get-Titles {
-            param([string]$Section)
-            if (-not $Section) { return @() }
-            @([regex]::Matches($Section, 'data-role="note-title"[^>]*>([^<]+)<') | ForEach-Object { $_.Groups[1].Value })
-        }
-
         $notes = @(
             @{ File = 'p1'; Title = 'Pin Uno'; Date = '2026-03-01'; Pinned = $true },
             @{ File = 'p2'; Title = 'Pin Due'; Date = '2026-05-01'; Pinned = $true },
@@ -194,6 +208,10 @@ Describe 'home page' {
         $HomeHtml | Should -Match '\[data-role="note-title"\]\s*\{[^}]*color: var\(--secondary\)[^}]*text-decoration: underline'
     }
 
+    It 'omits the tags section when no tag reaches 3 notes' {
+        $HomeHtml | Should -Not -Match '<section data-section="tags"'
+    }
+
     It 'links each note to its page' {
         $Pinned | Should -Match 'href="\./p2"'
         $List | Should -Match 'href="\./n3"'
@@ -219,5 +237,57 @@ Describe 'home page' {
         $html = Get-Page 'index.html'
         Get-Titles (Get-Section $html 'pinned') | Should -Be @('Pin 5', 'Pin 4', 'Pin 3', 'Pin 2')
         Get-Titles (Get-Section $html 'list') | Should -Be @('Pin 1')
+    }
+}
+
+Describe 'home tag cards' {
+    BeforeAll {
+        $notes = @(
+            @{ File = 'a1'; Title = 'Mesh Uno'; Date = '2026-01-01'; Tags = @('mesh') },
+            @{ File = 'a2'; Title = 'Mesh Due'; Date = '2026-02-01'; Tags = 'Mesh' },
+            @{ File = 'a3'; Title = 'Mesh Pin'; Date = '2026-03-01'; Tags = @('mesh', 'rust'); Pinned = $true },
+            @{ File = 'a4'; Title = 'Rust Solo'; Date = '2026-04-01'; Tags = @('rust') },
+            @{ File = 'a5'; Title = 'Smart Uno'; Date = '2026-05-01'; Tags = @('Smart Contracts', 'mesh') },
+            @{ File = 'a6'; Title = 'Smart Due'; Date = '2026-06-01'; Tags = @('Smart Contracts') },
+            @{ File = 'a7'; Title = 'Smart Tre'; Date = '2026-07-01'; Tags = @('smart contracts') },
+            @{ File = 'a8'; Title = 'Senza Tag' }
+        )
+        Build-Site (New-Fixture 'home-tags' $notes)
+        $script:Html = Get-Page 'index.html'
+    }
+
+    It 'orders the home as featured, tags, posts' {
+        $p = Get-Index $Html '<section data-section="pinned"'
+        $t = Get-Index $Html '<section data-section="tags"'
+        $l = Get-Index $Html '<section data-section="list"'
+        $t | Should -BeGreaterThan $p
+        $l | Should -BeGreaterThan $t
+    }
+
+    It 'shows one card per tag with at least 3 notes, most notes first' {
+        $cards = Get-TagCards $Html
+        $cards.Name | Should -Be @('mesh', 'smart-contracts')
+        $cards.Total | Should -Be @('(4)', '(3)')
+    }
+
+    It 'lists the notes of each card newest first' {
+        $cards = Get-TagCards $Html
+        $cards[0].Titles | Should -Be @('Smart Uno', 'Mesh Pin', 'Mesh Due', 'Mesh Uno')
+        $cards[1].Titles | Should -Be @('Smart Tre', 'Smart Due', 'Smart Uno')
+    }
+
+    It 'keeps carded notes out of Posts and pinned notes in Featured' {
+        Get-Titles (Get-Section $Html 'pinned') | Should -Be @('Mesh Pin')
+        Get-Titles (Get-Section $Html 'list') | Should -Be @('Rust Solo', 'Senza Tag')
+    }
+
+    It 'renders closed native disclosures and no tag pages' {
+        $Html | Should -Match '<details data-role="tag-card"(?![^>]*\bopen\b)[^>]*><summary'
+        Test-Path (Join-Path $script:Out 'tags') | Should -BeFalse
+    }
+
+    It 'animates the opening and disables it for reduced motion' {
+        $Html | Should -Match '::details-content'
+        $Html | Should -Match 'prefers-reduced-motion: reduce\)\s*\{\s*[^{}]*details-content'
     }
 }

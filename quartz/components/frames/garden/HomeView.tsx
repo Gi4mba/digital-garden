@@ -1,14 +1,7 @@
 import { siteInfo } from "../../../site-info"
 import { PageFrameProps } from "../types"
-import {
-  MAX_PINNED,
-  NoteInfo,
-  compareNotes,
-  coverSrc,
-  formatNoteDate,
-  hrefTo,
-  listNotes,
-} from "./notes"
+import { NoteInfo, coverSrc, formatNoteDate, hrefTo, listNotes } from "./notes"
+import { TagCollection, splitHome } from "./collections"
 import { Network } from "./Network"
 import { SiteFooter } from "./SiteFooter"
 import { FullSlug } from "../../../util/path"
@@ -38,15 +31,26 @@ function NoteItem({
   )
 }
 
+/** A closed native disclosure: independent drawers, keyboard and no-script support for free. */
+function TagCard({ collection, from }: { collection: TagCollection; from: FullSlug }) {
+  return (
+    <details data-role="tag-card">
+      <summary>
+        <span data-role="tag-name">{collection.tag}</span>
+        <span data-role="tag-count">{`(${collection.notes.length})`}</span>
+      </summary>
+      <ul>
+        {collection.notes.map((n) => (
+          <NoteItem note={n} from={from} withCover={false} />
+        ))}
+      </ul>
+    </details>
+  )
+}
+
 export function HomeView({ componentData }: PageFrameProps) {
   const from = componentData.fileData.slug!
-  const notes = listNotes(componentData.allFiles)
-  // The extra pinned notes beyond the cap fall back to the chronological list.
-  const pinned = notes
-    .filter((n) => n.pinned)
-    .sort(compareNotes)
-    .slice(0, MAX_PINNED)
-  const rest = notes.filter((n) => !pinned.includes(n)).sort(compareNotes)
+  const { pinned, collections, rest } = splitHome(listNotes(componentData.allFiles))
 
   return (
     <>
@@ -62,6 +66,18 @@ export function HomeView({ componentData }: PageFrameProps) {
             <ul>
               {pinned.map((n, i) => (
                 <NoteItem note={n} from={from} withCover featured={i === 0} />
+              ))}
+            </ul>
+          </section>
+        )}
+        {collections.length > 0 && (
+          <section data-section="tags">
+            <h2>Tags</h2>
+            <ul>
+              {collections.map((c) => (
+                <li>
+                  <TagCard collection={c} from={from} />
+                </li>
               ))}
             </ul>
           </section>

@@ -298,4 +298,77 @@ export const GARDEN_CSS = `
   margin-top: 0.6rem;
   font-size: clamp(1.05rem, 2vw, 1.25rem);
 }
+
+/* Home: tag cards. Compact like a filter; an open card takes the full row and drops down. */
+.page[data-frame="garden"] .garden-home {
+  interpolate-size: allow-keywords;
+}
+.page[data-frame="garden"] .garden-home [data-section="tags"] > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.page[data-frame="garden"] .garden-home [data-section="tags"] > ul > li:has(> details[open]) {
+  flex-basis: 100%;
+}
+.page[data-frame="garden"] details[data-role="tag-card"] {
+  border: 1px solid var(--lightgray);
+  border-radius: 4px;
+  background: var(--light);
+  transition: border-color 0.2s ease;
+}
+.page[data-frame="garden"] details[data-role="tag-card"]:hover,
+.page[data-frame="garden"] details[data-role="tag-card"][open] {
+  border-color: var(--secondary);
+}
+.page[data-frame="garden"] details[data-role="tag-card"] > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+  list-style: none;
+}
+.page[data-frame="garden"] details[data-role="tag-card"] > summary::-webkit-details-marker {
+  display: none;
+}
+.page[data-frame="garden"] details[data-role="tag-card"] > summary:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.page[data-frame="garden"] [data-role="tag-name"] {
+  font-family: var(--headerFont);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+.page[data-frame="garden"] [data-role="tag-count"] {
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary);
+}
+.page[data-frame="garden"] details[data-role="tag-card"] > ul {
+  padding: 0 0.85rem 0.75rem;
+}
+.page[data-frame="garden"] details[data-role="tag-card"] [data-role="note"] {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--lightgray);
+}
+.page[data-frame="garden"] details[data-role="tag-card"]::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    content-visibility 0.35s allow-discrete;
+}
+.page[data-frame="garden"] details[data-role="tag-card"][open]::details-content {
+  block-size: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page[data-frame="garden"] details[data-role="tag-card"]::details-content {
+    transition: none;
+  }
+}
 `
