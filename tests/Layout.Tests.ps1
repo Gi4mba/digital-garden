@@ -286,6 +286,10 @@ Describe 'home tag cards' {
         Test-Path (Join-Path $script:Out 'tags') | Should -BeFalse
     }
 
+    It 'eases the card width back on close instead of snapping' {
+        $Html | Should -Match '\[data-section="tags"\] > ul > li \{[^}]*transition:\s*flex-basis'
+    }
+
     It 'animates the opening and disables it for reduced motion' {
         $Html | Should -Match '::details-content'
         $Html | Should -Match 'prefers-reduced-motion: reduce\)\s*\{\s*[^{}]*details-content'

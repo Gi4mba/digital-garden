@@ -308,6 +308,10 @@ export const GARDEN_CSS = `
   flex-wrap: wrap;
   gap: 0.6rem;
 }
+/* Without this the card snaps narrow on close while its content is still collapsing. */
+.page[data-frame="garden"] .garden-home [data-section="tags"] > ul > li {
+  transition: flex-basis 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
 .page[data-frame="garden"] .garden-home [data-section="tags"] > ul > li:has(> details[open]) {
   flex-basis: 100%;
 }
@@ -367,7 +371,8 @@ export const GARDEN_CSS = `
   block-size: auto;
 }
 @media (prefers-reduced-motion: reduce) {
-  .page[data-frame="garden"] details[data-role="tag-card"]::details-content {
+  .page[data-frame="garden"] details[data-role="tag-card"]::details-content,
+  .page[data-frame="garden"] .garden-home [data-section="tags"] > ul > li {
     transition: none;
   }
 }
