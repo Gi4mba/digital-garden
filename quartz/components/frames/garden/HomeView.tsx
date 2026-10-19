@@ -20,7 +20,8 @@ function NoteItem({
   return (
     <li data-role="note" data-featured={featured ? "true" : undefined}>
       {withCover && note.image && (
-        <img data-role="card-cover" src={coverSrc(from, note.image)} alt={note.title} />
+        // Decorative: the title right below already names the note.
+        <img data-role="card-cover" src={coverSrc(from, note.image)} alt="" />
       )}
       {note.date && <time dateTime={note.date}>{formatNoteDate(note.date)}</time>}
       <a data-role="note-title" href={hrefTo(from, note.slug)}>

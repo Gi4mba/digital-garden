@@ -21,6 +21,10 @@ export const GARDEN_CSS = `
   letter-spacing: -0.01em;
 }
 .page[data-frame="garden"] nav[data-role="site-nav"] a {
+  /* Taller tap target without moving the bar. */
+  display: inline-block;
+  padding: 0.75rem 0;
+  margin: -0.75rem 0;
   color: var(--dark);
   text-decoration: none;
 }
@@ -44,10 +48,14 @@ export const GARDEN_CSS = `
   line-height: 1.5;
   color: var(--darkgray);
 }
+/* The deck sits a clear step above the body text. */
+.page[data-frame="garden"] header[data-role="article-header"] [data-role="summary"] {
+  font-size: clamp(1.1875rem, 1.05rem + 0.6vw, 1.45rem);
+}
 .page[data-frame="garden"] header[data-role="article-header"] time {
   font-family: var(--headerFont);
   font-size: 0.9rem;
-  color: var(--secondary);
+  color: var(--gray);
 }
 .page[data-frame="garden"] img[data-role="cover"] {
   display: block;
@@ -55,6 +63,7 @@ export const GARDEN_CSS = `
   height: auto;
   margin: 2rem 0 2.75rem;
   border-radius: 4px;
+  background: var(--lightgray);
 }
 
 /* Article body */
@@ -64,25 +73,35 @@ export const GARDEN_CSS = `
   text-wrap: wrap;
 }
 .page[data-frame="garden"] .markdown-rendered {
-  font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
-  line-height: 1.7;
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  line-height: 1.6;
 }
 .page[data-frame="garden"] .markdown-rendered :where(p, li, blockquote) {
-  line-height: 1.7;
+  line-height: 1.6;
 }
 .page[data-frame="garden"] .markdown-rendered p {
   margin: 0 0 1.25em;
 }
 .page[data-frame="garden"] .markdown-rendered h2 {
-  margin: 3.25rem 0 1rem;
-  font-size: clamp(1.45rem, 2.4vw, 1.75rem);
+  margin: 3.5rem 0 1rem;
+  font-size: clamp(1.625rem, 1.4rem + 0.8vw, 2rem);
   line-height: 1.2;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 .page[data-frame="garden"] .markdown-rendered h3 {
-  margin: 2.75rem 0 0.75rem;
-  font-size: clamp(1.25rem, 2.2vw, 1.45rem);
-  line-height: 1.3;
+  margin: 3rem 0 0.75rem;
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.625rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+/* A rule written right under a heading reads as its underline, not as a section break. */
+.page[data-frame="garden"] .markdown-rendered :is(h2, h3):has(+ hr) {
+  margin-bottom: 0.5rem;
+}
+.page[data-frame="garden"] .markdown-rendered :is(h2, h3) + hr {
+  margin: 0 0 1.25rem;
 }
 .page[data-frame="garden"] .markdown-rendered :where(ul, ol) {
   margin: 0 0 1.25em;
@@ -133,8 +152,14 @@ export const GARDEN_CSS = `
   margin: 0;
 }
 .page[data-frame="garden"] footer[data-role="site-footer"] a {
+  display: inline-block;
+  padding: 0.5rem 0;
+  margin: -0.5rem 0;
   color: inherit;
   font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
 /* Home */
@@ -157,12 +182,14 @@ export const GARDEN_CSS = `
 .page[data-frame="garden"] .garden-home section {
   margin-top: clamp(2.5rem, 7vw, 4rem);
 }
+/* Section headings are real headings, a step above the note summaries. */
 .page[data-frame="garden"] .garden-home section > h2 {
   margin: 0 0 1.25rem;
   font-family: var(--headerFont);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--darkgray);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--dark);
 }
 .page[data-frame="garden"] .garden-home ul {
   list-style: none;
@@ -173,7 +200,7 @@ export const GARDEN_CSS = `
   display: block;
   font-family: var(--headerFont);
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--gray);
 }
 .page[data-frame="garden"] .garden-home [data-role="note-title"] {
   display: block;
@@ -212,8 +239,9 @@ export const GARDEN_CSS = `
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  margin-bottom: 0.9rem;
+  margin: 0 0 0.9rem;
   border-radius: 4px;
+  background: var(--lightgray);
 }
 
 /* Chronological list */
@@ -269,10 +297,11 @@ export const GARDEN_CSS = `
   position: absolute;
   inset: 0 0 auto 0;
   width: 100%;
-  height: 18rem;
+  /* Shorter on phones so the lines stay behind the header, not the first section. */
+  height: clamp(10rem, 40vw, 18rem);
   z-index: -1;
   color: var(--secondary);
-  opacity: 0.45;
+  opacity: 0.3;
   pointer-events: none;
   -webkit-mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 25%, transparent 100%);
@@ -316,14 +345,19 @@ export const GARDEN_CSS = `
   flex-basis: 100%;
 }
 .page[data-frame="garden"] details[data-role="tag-card"] {
-  border: 1px solid var(--lightgray);
+  /* At least 3:1 against the page, so the closed card still reads as a control. */
+  border: 1px solid color-mix(in srgb, var(--gray) 75%, var(--light));
   border-radius: 4px;
   background: var(--light);
   transition: border-color 0.2s ease;
 }
-.page[data-frame="garden"] details[data-role="tag-card"]:hover,
 .page[data-frame="garden"] details[data-role="tag-card"][open] {
   border-color: var(--secondary);
+}
+@media (hover: hover) {
+  .page[data-frame="garden"] details[data-role="tag-card"]:hover {
+    border-color: var(--secondary);
+  }
 }
 .page[data-frame="garden"] details[data-role="tag-card"] > summary {
   display: flex;
@@ -374,6 +408,34 @@ export const GARDEN_CSS = `
   .page[data-frame="garden"] details[data-role="tag-card"]::details-content,
   .page[data-frame="garden"] .garden-home [data-section="tags"] > ul > li {
     transition: none;
+  }
+}
+/* Browser surfaces: they ship with the page, so they follow its palette too. */
+:root[saved-theme="dark"] {
+  color-scheme: dark;
+}
+:root[saved-theme="light"] {
+  color-scheme: light;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+.page[data-frame="garden"] ::selection {
+  background: color-mix(in srgb, var(--secondary) 24%, var(--light));
+  color: var(--dark);
+}
+.page[data-frame="garden"] a:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+:root[saved-theme="dark"] .page[data-frame="garden"] svg[data-role="network"] {
+  opacity: 0.25;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 `

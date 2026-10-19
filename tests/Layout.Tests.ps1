@@ -149,6 +149,23 @@ Describe 'article page' {
         $Article | Should -Match 'function layout\(\)\{var heads='
     }
 
+    It 'keeps a heading close to its text when the author puts a rule under it' {
+        $Article | Should -Match ':is\(h2, h3\) \+ hr \{[^}]*margin: 0 0 1\.25rem'
+    }
+
+    It 'themes keyboard focus, selection, scrollbars and smooth scroll for every page' {
+        $Article | Should -Match 'a:focus-visible'
+        $Article | Should -Match ':root\[saved-theme="dark"\] \{\s*color-scheme: dark'
+        $Article | Should -Match '::selection \{[^}]*color: var\(--dark\)'
+        $Article | Should -Match 'prefers-reduced-motion: reduce\)\s*\{\s*html \{\s*scroll-behavior: auto'
+    }
+
+    It 'treats the cover as decoration next to the title' {
+        # Preact serialises alt="" as a bare `alt`; both mean an empty text alternative.
+        $Article | Should -Match '<img data-role="cover"[^>]*\balt(="")?[\s/>]'
+        $Article | Should -Not -Match '<img data-role="cover"[^>]*\balt="[^"]'
+    }
+
     It 'has no network background on article pages' {
         $Article | Should -Not -Match '<svg data-role="network"'
     }
@@ -206,6 +223,10 @@ Describe 'home page' {
 
     It 'styles the note titles as visible links (accent colour, underlined)' {
         $HomeHtml | Should -Match '\[data-role="note-title"\]\s*\{[^}]*color: var\(--secondary\)[^}]*text-decoration: underline'
+    }
+
+    It 'gives covers a quiet placeholder and no stray top margin' {
+        $HomeHtml | Should -Match 'img\[data-role="card-cover"\] \{[^}]*margin: 0 0 0\.9rem[^}]*background: var\(--lightgray\)'
     }
 
     It 'omits the tags section when no tag reaches 3 notes' {

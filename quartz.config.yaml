@@ -14,14 +14,16 @@ configuration:
     fontOrigin: googleFonts
     cdnCaching: true
     typography:
-      header: Schibsted Grotesk
+      header:
+        name: Schibsted Grotesk
+        weights: [400, 600, 700]
       body: Literata
       code: IBM Plex Mono
     colors:
       lightMode:
         light: "#F3F5F5"
         lightgray: "#D6DDDC"
-        gray: "#8A9694"
+        gray: "#5E6B69"
         darkgray: "#3F4B49"
         dark: "#18201F"
         secondary: "#1F6F78"
@@ -31,7 +33,7 @@ configuration:
       darkMode:
         light: "#0F1414"
         lightgray: "#263030"
-        gray: "#6F7D7B"
+        gray: "#8E9B99"
         darkgray: "#C9D3D1"
         dark: "#E3EAE9"
         secondary: "#6DBFC6"

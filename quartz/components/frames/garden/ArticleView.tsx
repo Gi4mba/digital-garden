@@ -24,7 +24,7 @@ export function ArticleView({ componentData, pageBody: Content }: PageFrameProps
           {description && <p data-role="summary">{description}</p>}
           {date && <time dateTime={date}>{formatNoteDate(date)}</time>}
         </header>
-        {image && <img data-role="cover" src={coverSrc(fileData.slug!, image)} alt={title} />}
+        {image && <img data-role="cover" src={coverSrc(fileData.slug!, image)} alt="" />}
         <Content {...componentData} />
       </main>
       <SiteFooter />
