@@ -42,6 +42,22 @@ Describe 'Test-PublishNotes' {
         New-TestFile $pub 'img/c.jpg' | Out-Null
     }
 
+    It 'errors on an unquoted value with ": " that breaks the Quartz build' {
+        New-TestNote $pub 'a.md' @('title: T', 'description: Rust: what was easy', 'image: img/c.jpg', 'date: 2026-01-01')
+        New-TestNote $pub 'b.md' @('title: Ends with a colon:', 'description: D', 'image: img/c.jpg', 'date: 2026-01-01')
+        $r = Test-PublishNotes -PublishDir $pub
+        $r.Errors | Should -HaveCount 2
+        $r.Errors[0] | Should -Match "a\.md: campo 'description'.*virgolette"
+        $r.Errors[1] | Should -Match "b\.md: campo 'title'.*virgolette"
+    }
+
+    It 'accepts quoted values, inline lists and colons without a space' {
+        New-TestNote $pub 'a.md' @('title: "Rust: what was easy"', "description: 'Signing offline: sync later'", 'image: img/c.jpg', 'date: 2026-01-01', 'tags: [mesh, rust]')
+        New-TestNote $pub 'b.md' @('title: Ratio 3:1 at 10:30', 'description: See https://example.org/a', 'image: img/c.jpg', 'date: 2026-01-01')
+        $r = Test-PublishNotes -PublishDir $pub
+        $r.Errors | Should -BeNullOrEmpty
+    }
+
     It 'accepts tags as a YAML list or inline, without errors or warnings' {
         New-TestNote $pub 'a.md' ((New-ValidFront) + @('tags:', '  - mesh', '  - Smart Contracts'))
         New-TestNote $pub 'b.md' ((New-ValidFront) + @('tags: [mesh, rust]'))

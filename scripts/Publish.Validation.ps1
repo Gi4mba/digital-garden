@@ -25,6 +25,27 @@ function Read-NoteFrontmatter {
     $fm
 }
 
+# Keys whose unquoted value YAML reads as a nested mapping (": " inside, or ":" at the end).
+# The parser above tolerates them, but Quartz uses a real YAML parser and the build fails.
+function Get-FrontmatterYamlIssues {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$Path)
+
+    $lines = [IO.File]::ReadAllText($Path).TrimStart([char]0xFEFF) -split "`r?`n"
+    if ($lines.Count -eq 0 -or $lines[0].TrimEnd() -ne '---') { return @() }
+    $keys = for ($i = 1; $i -lt $lines.Count; $i++) {
+        if ($lines[$i].TrimEnd() -eq '---') { break }
+        if ($lines[$i] -match '^([A-Za-z_][\w-]*)\s*:\s*(.+?)\s*$') {
+            # Save both groups now: the -match below overwrites $Matches.
+            $key = $Matches[1].ToLowerInvariant()
+            $value = $Matches[2]
+            $quotedOrFlow = $value[0] -in @('"', "'", '[', '{')
+            if (-not $quotedOrFlow -and ($value.Contains(': ') -or $value.EndsWith(':'))) { $key }
+        }
+    }
+    @($keys)
+}
+
 function Get-PublishNoteFiles {
     param([string]$PublishDir)
     $root = (Resolve-Path -LiteralPath $PublishDir).Path.TrimEnd('\', '/')
@@ -56,6 +77,10 @@ function Test-PublishNotes {
         $description = & $get 'description'
         $image = & $get 'image'
         $date = & $get 'date'
+
+        foreach ($key in Get-FrontmatterYamlIssues -Path $f.FullName) {
+            $errors.Add("${rel}: campo '$key' non valido per Quartz (contiene ': ' o finisce con ':'): metti il valore tra virgolette")
+        }
 
         foreach ($pair in @(@('title', $title), @('description', $description), @('image', $image))) {
             if ([string]::IsNullOrWhiteSpace($pair[1])) { $errors.Add("${rel}: campo '$($pair[0])' mancante") }
