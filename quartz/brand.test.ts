@@ -76,6 +76,12 @@ describe("brand images", () => {
     assert.strictEqual(await size("apple-touch-icon.png"), "180x180")
   })
 
+  test("the font used for the name on the cover ships with its licence", () => {
+    const fonts = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "scripts", "fonts")
+    assert.ok(fs.statSync(path.join(fonts, "SchibstedGrotesk[wght].ttf")).size > 100_000)
+    assert.match(fs.readFileSync(path.join(fonts, "OFL.txt"), "utf8"), /SIL Open Font License/)
+  })
+
   test("the social cover is 1200x630 and light", async () => {
     assert.strictEqual(await size("og-image.png"), "1200x630")
     assert.ok(read("og-image.png").length < 300_000)

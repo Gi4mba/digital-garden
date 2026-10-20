@@ -5,7 +5,9 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import sharp from "sharp"
 
-const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "quartz", "static")
+const HERE = path.dirname(fileURLToPath(import.meta.url))
+const OUT = path.join(HERE, "..", "quartz", "static")
+const FONT = path.join(HERE, "fonts", "SchibstedGrotesk[wght].ttf")
 const BG = "#0F1414"
 const INK = "#6DBFC6"
 
@@ -30,8 +32,25 @@ function mulberry32(seed) {
   }
 }
 
+// The site name in the header font (Schibsted Grotesk Bold), trimmed to the glyphs.
+async function wordmark() {
+  const text = await sharp({
+    text: {
+      text: `<span foreground="#E3EAE9">Hyphae</span>`,
+      font: "Schibsted Grotesk Bold 118",
+      fontfile: FONT,
+      rgba: true,
+      dpi: 72,
+    },
+  })
+    .trim()
+    .png()
+    .toBuffer({ resolveWithObject: true })
+  return { input: text.data, w: text.info.width, h: text.info.height }
+}
+
 // The same seeded network as the home header, stretched over the cover.
-function coverSvg() {
+function coverSvg(name) {
   const W = 1200
   const H = 630
   const COLS = 10
@@ -64,9 +83,16 @@ function coverSvg() {
     .map(([a, b]) => `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"/>`)
     .join("")
   const dots = nodes.map((n) => `<circle cx="${n.x}" cy="${n.y}" r="3.5"/>`).join("")
-  const T = 300
-  const logo = `<g transform="translate(${(W - T) / 2} ${(H - T) / 2}) scale(${T / 64})"><rect width="64" height="64" rx="14" fill="${BG}" stroke="${INK}" stroke-opacity="0.5" stroke-width="0.6"/>${MARK}</g>`
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${BG}"/><g stroke="${INK}" stroke-opacity="0.38" stroke-width="1.6" stroke-linecap="round">${lines}</g><g fill="${INK}" fill-opacity="0.6">${dots}</g>${logo}</svg>`
+  // Logo above the name, centred together; narrower than 630px so a square crop keeps both.
+  const T = 220
+  const GAP = 40
+  const top = Math.round((H - (T + GAP + name.h)) / 2)
+  const logo = `<g transform="translate(${(W - T) / 2} ${top}) scale(${T / 64})"><rect width="64" height="64" rx="14" fill="${BG}" stroke="${INK}" stroke-opacity="0.5" stroke-width="0.6"/>${MARK}</g>`
+  const PAD = 56
+  const panelW = Math.max(T, name.w) + 2 * PAD
+  const panel = `<rect x="${(W - panelW) / 2}" y="${top - PAD}" width="${panelW}" height="${T + GAP + name.h + 2 * PAD}" rx="28" fill="${BG}"/>`
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="${BG}"/><g stroke="${INK}" stroke-opacity="0.38" stroke-width="1.6" stroke-linecap="round">${lines}</g><g fill="${INK}" fill-opacity="0.6">${dots}</g>${panel}${logo}</svg>`
+  return { svg, nameLeft: Math.round((W - name.w) / 2), nameTop: top + T + GAP }
 }
 
 const png = (source, size, name, opts = {}) =>
@@ -80,5 +106,10 @@ await png(tile, { w: 512 }, "icon.png")
 await png(tile, { w: 192 }, "icon-192.png")
 await png(square(0.7), { w: 512 }, "icon-maskable-512.png")
 await png(square(0.86), { w: 180 }, "apple-touch-icon.png")
-await png(coverSvg(), { w: 1200, h: 630 }, "og-image.png")
+const name = await wordmark()
+const cover = coverSvg(name)
+await sharp(Buffer.from(cover.svg))
+  .composite([{ input: name.input, left: cover.nameLeft, top: cover.nameTop }])
+  .png({ compressionLevel: 9, palette: true })
+  .toFile(path.join(OUT, "og-image.png"))
 console.log("brand assets written to", OUT)
