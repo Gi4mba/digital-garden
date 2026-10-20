@@ -241,6 +241,7 @@ Describe 'home page' {
 
     It 'omits the tags section when no tag reaches 3 notes' {
         $HomeHtml | Should -Not -Match '<section data-section="tags"'
+        $HomeHtml | Should -Not -Match 'sessionStorage'
     }
 
     It 'links each note to its page' {
@@ -324,5 +325,22 @@ Describe 'home tag cards' {
     It 'animates the opening and disables it for reduced motion' {
         $Html | Should -Match '::details-content'
         $Html | Should -Match 'prefers-reduced-motion: reduce\)\s*\{\s*[^{}]*details-content'
+    }
+
+    It 'restores the open cards from the tab session, inside the tags section' {
+        $tags = Get-Section $Html 'tags'
+        $tags | Should -Match '<script>[^<]*sessionStorage[^<]*</script>'
+        $tags | Should -Match "details\[data-role=""tag-card""\]|details\[data-role=.tag-card.\]"
+    }
+
+    It 'guards every storage access and never listens for page exit' {
+        $script = [regex]::Match((Get-Section $Html 'tags'), '<script>(.*?)</script>', 'Singleline').Groups[1].Value
+        ([regex]::Matches($script, 'try\s*\{')).Count | Should -BeGreaterOrEqual 2
+        $script | Should -Not -Match 'unload|pagehide|visibilitychange'
+    }
+
+    It 'switches transitions off while the saved state is restored' {
+        $Html | Should -Match 'data-restoring[^{]*details\[data-role="tag-card"\]::details-content[^{]*\{[^}]*transition: none !important'
+        (Get-Section $Html 'tags') | Should -Match 'data-restoring'
     }
 }

@@ -4,6 +4,7 @@ import { NoteInfo, coverSrc, formatNoteDate, hrefTo, listNotes } from "./notes"
 import { TagCollection, splitHome } from "./collections"
 import { Network } from "./Network"
 import { SiteFooter } from "./SiteFooter"
+import { TagCardMemory } from "./TagCardMemory"
 import { FullSlug } from "../../../util/path"
 
 function NoteItem({
@@ -81,6 +82,7 @@ export function HomeView({ componentData }: PageFrameProps) {
                 </li>
               ))}
             </ul>
+            <TagCardMemory />
           </section>
         )}
         {rest.length > 0 && (

@@ -9,7 +9,7 @@ Le note vivono nel vault Obsidian, nella cartella `Publish/`. `scripts/publish.p
 1. PowerShell 7, Node >= 22, git.
 2. `copy scripts\publish.config.example.json scripts\publish.config.json` e imposta `publishDir` sul percorso di `Publish/`.
 3. Su GitHub: Settings → Pages → Source "GitHub Actions".
-4. In ogni nota da pubblicare: `title`, `description`, `image` (relativo a `Publish/`); opzionali `date: yyyy-MM-dd`, `pinned: true` (max 4) e `tags` (lista o testo separato da virgole; maiuscole indifferenti). Un tag presente in almeno 3 note diventa una card nella home, e quelle note escono da "Posts". Un valore che contiene `: ` (o finisce con `:`) va tra virgolette, altrimenti la build di Quartz fallisce: lo script lo segnala come errore.
+4. In ogni nota da pubblicare: `title`, `description`, `image` (relativo a `Publish/`); opzionali `date: yyyy-MM-dd`, `pinned: true` (max 4) e `tags` (lista o testo separato da virgole; maiuscole indifferenti). Un tag presente in almeno 3 note diventa una card nella home, e quelle note escono da "Posts". Le card aperte restano aperte tornando alla home (pulsante Home, "indietro" o ricaricamento) finché la scheda del browser è aperta. Un valore che contiene `: ` (o finisce con `:`) va tra virgolette, altrimenti la build di Quartz fallisce: lo script lo segnala come errore.
 
 ## Pubblicare
 
