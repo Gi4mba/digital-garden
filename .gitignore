@@ -18,3 +18,5 @@ tests/.out-preview*/
 scripts/publish.config.json
 testResults.xml
 .claude/
+/CLAUDE.md
+/docs/
