@@ -1,0 +1,22 @@
+{
+  "name": "Hyphae",
+  "short_name": "Hyphae",
+  "description": "The visible part is the post. The network underneath is how I think.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "../",
+  "scope": "../",
+  "display": "standalone",
+  "background_color": "#0F1414",
+  "theme_color": "#0F1414",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

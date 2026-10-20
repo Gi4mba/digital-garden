@@ -27,17 +27,21 @@ export default (() => {
     const url = new URL(`https://${cfg.baseUrl ?? "example.com"}`)
     const path = url.pathname as FullSlug
     const baseDir = fileData.slug === "404" ? path : pathToRoot(fileData.slug!)
-    const iconPath = joinSegments(baseDir, "static/icon.png")
+    const staticPath = (file: string) => joinSegments(baseDir, "static", file)
 
     // Url of current page
     const socialUrl =
       fileData.slug === "404" ? url.toString() : joinSegments(url.toString(), fileData.slug!)
 
     // Social preview = the note's cover image, as emitted by Quartz (slugified, encoded).
+    // Pages without one (the home, notes with no cover) fall back to the site cover.
     const cover = fileData.frontmatter?.image
+    const siteCover = `https://${cfg.baseUrl}/static/og-image.png`
     const ogImage = cover
       ? `https://${cfg.baseUrl}/${encodeURI(slugifyFilePath(String(cover) as FilePath))}`
-      : undefined
+      : cfg.baseUrl
+        ? siteCover
+        : undefined
 
     const coreStylesheet = css[0]?.content
     const coreScript = js.find(
@@ -83,6 +87,12 @@ export default (() => {
               property="og:image:type"
               content={`image/${getFileExtension(ogImage) ?? "png"}`}
             />
+            {ogImage === siteCover && (
+              <>
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+              </>
+            )}
           </>
         )}
 
@@ -94,7 +104,12 @@ export default (() => {
           </>
         )}
 
-        <link rel="icon" href={iconPath} />
+        <link rel="icon" href={staticPath("icon.svg")} type="image/svg+xml" />
+        <link rel="icon" href={staticPath("icon.png")} type="image/png" />
+        <link rel="apple-touch-icon" href={staticPath("apple-touch-icon.png")} />
+        <link rel="manifest" href={staticPath("site.webmanifest")} />
+        <meta name="theme-color" content="#F3F5F5" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0F1414" media="(prefers-color-scheme: dark)" />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
 

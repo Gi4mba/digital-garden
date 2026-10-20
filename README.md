@@ -21,3 +21,7 @@ pwsh scripts/publish.ps1           # valida, copia, commit, push
 Il repo locale deve stare sul branch `main` (lo script rifiuta altrimenti: è quello che fa partire il deploy). Se un push fallisce, rilancia lo script: reinvia i commit rimasti indietro.
 
 La home (`content/index.md`) appartiene al repo e non viene toccata dal mirror. Test: `Invoke-Pester tests/` (Pester >= 5.5). Anteprima locale: `npx quartz build --serve -d content`.
+
+## Logo e immagini del sito
+
+Il logo (la rete di sei nodi), la favicon, le icone per telefono e la cover delle anteprime social nascono da un solo disegno, in `scripts/brand-assets.mjs`. Per rigenerare tutto in `quartz/static`: `node scripts/brand-assets.mjs`. Il manifest è `quartz/static/site.webmanifest` e va tenuto allineato a nome e descrizione in `quartz/site-info.ts` (lo verifica `npm test`). Le pagine senza cover propria usano `og-image.png` come anteprima. WhatsApp e gli altri social tengono in memoria le anteprime già viste: un link già condiviso può mostrare la vecchia immagine per giorni.

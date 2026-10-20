@@ -115,6 +115,25 @@ Describe 'article page' {
         Test-Path -LiteralPath (Join-Path $script:Out 'img/città-1.jpg') | Should -BeTrue
     }
 
+    It 'links the vector favicon, the PNG fallback, the iPhone icon and the manifest' {
+        $Article | Should -Match '<link rel="icon" href="\./static/icon\.svg" type="image/svg\+xml"'
+        $Article | Should -Match '<link rel="icon" href="\./static/icon\.png" type="image/png"'
+        $Article | Should -Match '<link rel="apple-touch-icon" href="\./static/apple-touch-icon\.png"'
+        $Article | Should -Match '<link rel="manifest" href="\./static/site\.webmanifest"'
+        (Get-Page 'cartella/annidata.html') | Should -Match '<link rel="manifest" href="\.\./static/site\.webmanifest"'
+    }
+
+    It 'colours the phone browser bar for light and dark themes' {
+        $Article | Should -Match '<meta name="theme-color" content="#F3F5F5" media="\(prefers-color-scheme: light\)"'
+        $Article | Should -Match '<meta name="theme-color" content="#0F1414" media="\(prefers-color-scheme: dark\)"'
+    }
+
+    It 'publishes the brand files' {
+        foreach ($f in 'icon.svg', 'icon.png', 'icon-192.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'og-image.png', 'site.webmanifest') {
+            Test-Path -LiteralPath (Join-Path $script:Out "static/$f") | Should -BeTrue -Because $f
+        }
+    }
+
     It 'has a top bar that links back to the home' {
         $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*>.*Home</a>'
         $nested = Get-Page 'cartella/annidata.html'
@@ -202,6 +221,14 @@ Describe 'home page' {
         $script:HomeHtml = Get-Page 'index.html'
         $script:Pinned = Get-Section $script:HomeHtml 'pinned'
         $script:List = Get-Section $script:HomeHtml 'list'
+    }
+
+    It 'gives the home the site cover as social preview, with its size' {
+        $cover = 'https://gi4mba.github.io/digital-garden/static/og-image.png'
+        $HomeHtml | Should -Match ('<meta property="og:image" content="' + [regex]::Escape($cover) + '"')
+        $HomeHtml | Should -Match ('<meta name="twitter:image" content="' + [regex]::Escape($cover) + '"')
+        $HomeHtml | Should -Match '<meta property="og:image:width" content="1200"'
+        $HomeHtml | Should -Match '<meta property="og:image:height" content="630"'
     }
 
     It 'draws the faint network behind the home header and no progress bar' {
