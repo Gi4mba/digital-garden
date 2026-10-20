@@ -410,6 +410,11 @@ export const GARDEN_CSS = `
     transition: none;
   }
 }
+/* Cards reopened from the tab's memory appear already open: no drop-down on arrival. */
+.page[data-frame="garden"] [data-section="tags"][data-restoring] details[data-role="tag-card"]::details-content,
+.page[data-frame="garden"] [data-section="tags"][data-restoring] > ul > li {
+  transition: none !important;
+}
 /* Browser surfaces: they ship with the page, so they follow its palette too. */
 :root[saved-theme="dark"] {
   color-scheme: dark;
