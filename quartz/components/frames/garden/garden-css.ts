@@ -14,6 +14,8 @@ export const GARDEN_CSS = `
 
 /* Top bar */
 .page[data-frame="garden"] nav[data-role="site-nav"] {
+  /* The button is fixed on phones, so the bar keeps its height for the text below. */
+  min-height: 2.75rem;
   padding: 1.5rem 0;
   margin-bottom: clamp(1.5rem, 5vw, 3.5rem);
   font-family: var(--headerFont);
@@ -21,15 +23,48 @@ export const GARDEN_CSS = `
   letter-spacing: -0.01em;
 }
 .page[data-frame="garden"] nav[data-role="site-nav"] a {
-  /* Taller tap target without moving the bar. */
-  display: inline-block;
-  padding: 0.75rem 0;
-  margin: -0.75rem 0;
+  /* Phones: pinned to the top-left of the screen, under the progress thread. */
+  position: fixed;
+  top: calc(12px + 0.5rem);
+  left: var(--garden-gutter);
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 0.95rem 0 0.8rem;
+  /* At least 3:1 against the page, so it reads as a control (same as the tag cards). */
+  border: 1px solid color-mix(in srgb, var(--gray) 75%, var(--light));
+  border-radius: 4px;
+  background: var(--light);
   color: var(--dark);
   text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
-.page[data-frame="garden"] nav[data-role="site-nav"] a:hover {
+.page[data-frame="garden"] nav[data-role="site-nav"] a svg[data-role="back-arrow"] {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
   color: var(--secondary);
+}
+@media (hover: hover) {
+  .page[data-frame="garden"] nav[data-role="site-nav"] a:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+  }
+}
+@media (min-width: 640px) {
+  /* Wider screens: back in the bar, where the plain link used to be. */
+  .page[data-frame="garden"] nav[data-role="site-nav"] a {
+    position: static;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page[data-frame="garden"] nav[data-role="site-nav"] a {
+    transition: none;
+  }
 }
 
 /* Article header */

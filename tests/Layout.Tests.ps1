@@ -116,9 +116,19 @@ Describe 'article page' {
     }
 
     It 'has a top bar that links back to the home' {
-        $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*>Home</a>'
+        $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*>.*Home</a>'
         $nested = Get-Page 'cartella/annidata.html'
-        $nested | Should -Match '<nav data-role="site-nav"[^>]*><a href="../"[^>]*>Home</a>'
+        $nested | Should -Match '<nav data-role="site-nav"[^>]*><a href="../"[^>]*>.*Home</a>'
+    }
+
+    It 'puts a decorative back arrow before the Home label' {
+        $Article | Should -Match '<nav data-role="site-nav"[^>]*><a href="./"[^>]*><svg[^>]*data-role="back-arrow"[^>]*aria-hidden="true"[^>]*>.*?</svg>Home</a>'
+    }
+
+    It 'styles the Home link as a bordered button, fixed top-left on phones and in the bar from 640px' {
+        $Article | Should -Match 'nav\[data-role="site-nav"\] a \{[^}]*border: 1px solid color-mix\([^}]*border-radius: 4px[^}]*\}'
+        $Article | Should -Match 'nav\[data-role="site-nav"\] a \{[^}]*position: fixed[^}]*\}'
+        $Article | Should -Match '@media \(min-width: 640px\) \{\s*(/\*.*?\*/\s*)?\.page\[data-frame="garden"\] nav\[data-role="site-nav"\] a \{[^}]*position: static'
     }
 
     It 'ends the page with the thread divider inside the footer' {
